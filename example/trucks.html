@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>delivery inbound</title>
+
+    <style type="text/css">
+        body {
+            font-family: Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .everything-container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+        }
+        .tube {
+            position: fixed;
+            z-index: 100;
+            top: 135px;
+            height: 330px;
+            width: 300px;
+        }
+        .tube-left {
+            left: 0;
+            background-image: url('images/tube-left.png');
+        }
+        .tube-right {
+            right: 0;
+            background-image: url('images/tube-right.png');
+        }
+        .button-container {
+            position: fixed;
+            z-index: 150;
+            top: 200px;
+            left: 40px;
+            height: 120px;
+            width: 100px;
+        }
+        .truck {
+            height: 50px;
+            width: 200px;
+            background-image: url('images/truck1.png');
+            position: absolute;
+            z-index: 50;
+            left: 100px;
+        }
+        .container-text {
+            width: 130px;
+            margin: 5px;
+            padding-top: 5px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
+    <link rel = "stylesheet" type = "text/css" href = "../round-buttons.css" />
+
+    <script src="scripts/jquery-3.3.1.min.js"></script>
+    
+    <script type="text/javascript">
+        function randomIntFromInterval(min,max)
+        {
+            return Math.floor(Math.random()*(max-min+1)+min);
+        }
+
+        var theInternetModel = function() {
+            var self = this;
+            self.truckHeight = 50;
+            self.truckWidth = 200;
+            self.tubeTop = 160;
+            self.tubBottom = 440;
+            self.trafficWaitTime = 500;
+            self.myWidth = $(".everything-container").width();
+            self.trafficTypes = ["MEMES", "reaction GIFs","News","arguments","Internet banking","Cheap junk","Expensive junk","Duck discussion","Duck photos","Duck questions","Duck answers","Duck GIFs","Duck forums","Schadenfreude", "Usless Apps","SPAM SPAM","FANDOMS","Fanboys","Fangirls","Sexy stories","Serious Work","Tweets","Cat pictures","Javascript errors","Dashcam Videos","Sad stuff","EMOJIS","Example text","lorem ipsum","Pirates","Hackers","Ongoing DoS","Death threats","Idiots","Hello world","Broken flash", "Malware","bad GooGLE","Facebook leaks","Dirty secrets","Stock photos","Tshirts 4 sale","Truck sims","Dark webs","Designed 4 IE6"];
+            self.trafficTypeIndex = randomIntFromInterval(0, self.trafficTypes.length-1);
+            self.maxSpeed = 600;
+            self.minSpeed = 100;
+                
+            self.status = "running";
+
+            self.updateButtonText = function() {
+                var text = "start";
+                if(self.status == "running") {
+                    text = "stop";
+                }
+                $(".switch").text(text);
+            }
+
+            self.toggleStatus = function() {
+                if(self.status == "running") {
+                    self.status = "stopped";
+                } else if (self.status == "stopped") {
+                    self.status = "running";
+                }
+                self.updateButtonText();
+            }
+            self.goFaster = function() {
+                self.trafficWaitTime = self.trafficWaitTime + 100;
+                if(self.trafficWaitTime > self.maxSpeed) {
+                    self.trafficWaitTime = self.maxSpeed;
+                }
+            }
+            self.goSlower = function() {
+                self.trafficWaitTime = self.trafficWaitTime - 100;
+                if(self.trafficWaitTime < self.minSpeed) {
+                    self.trafficWaitTime = self.minSpeed;
+                }
+            }
+
+            self.makeTruck = function() {
+                var top = randomIntFromInterval(self.tubeTop,self.tubBottom-self.truckHeight);
+                var trafficType = self.getTrafficType();
+                var truckHtml = "<div class='truck'></div>";
+                $(".everything-container").append(truckHtml);
+                var truck = $(".everything-container .truck").last();
+                $(truck).css("top",top).append("<div class='container-text'>"+trafficType+"</div>");
+                $(truck).animate({
+                    left: self.myWidth,
+                }, 10000 , "linear", function() {
+                    $(truck).remove();
+                });
+            }
+            self.getTrafficType = function() {
+                self.trafficTypeIndex++;
+                if(self.trafficTypeIndex >= self.trafficTypes.length) {
+                    self.trafficTypeIndex = 0;
+                }
+                
+                return self.trafficTypes[self.trafficTypeIndex];
+            }
+            
+            self.makeInternetTraffic = function() {
+                if(self.status == "running") {
+                    self.makeTruck();
+                }
+                setTimeout(function(){ self.makeInternetTraffic(); }, self.trafficWaitTime);
+            }
+            self.makeInternetTraffic();
+        };
+
+        $(document).ready(function () {
+
+            var theInternet = new theInternetModel();
+
+            $(".switch").on("click", function() {
+                theInternet.toggleStatus();
+            });
+
+        })
+    </script>
+</head>
+
+<body>
+    <div class="everything-container">
+        <div class="button-container">
+                <div class="switch round-button">stop</div>
+        </div>
+        <div class="tube-left tube"></div>
+        <div class="tube-right tube"></div>
+    </div>
+</body>
+</html>
